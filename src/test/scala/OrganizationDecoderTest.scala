@@ -33,6 +33,7 @@ class OrganizationDecoderTest extends org.specs2.mutable.Specification {
             ]
           }
         """
+
       "should correctly parse" >> {
         val result: Either[Error, Organization] = decode[Organization](rawJson)
 
