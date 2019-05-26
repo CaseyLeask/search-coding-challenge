@@ -18,41 +18,44 @@ object Main {
     sourceFile
   }
 
-  val organizationsFilename = "data/organizations.json"
-  def readOrganizationsFile() = readFile(organizationsFilename)
+  private def readOrganizations = {
+    val organizationsFilename = "data/organizations.json"
+    decode[Seq[Organization]](readFile(organizationsFilename))
+      .left
+      .map(e => SearchFailure(s"Error parsing $organizationsFilename: ${e.getLocalizedMessage}"))
+  }
 
-  val ticketsFilename = "data/tickets.json"
-  def readTicketsFile() = readFile(ticketsFilename)
+  private def readTickets = {
+    val ticketsFilename = "data/tickets.json"
+    decode[Seq[Ticket]](readFile(ticketsFilename)).left.map(e =>
+      SearchFailure(s"Error parsing $ticketsFilename: ${e.getLocalizedMessage}")
+    )
+  }
 
-  val usersFilename = "data/users.json"
-  def readUsersFile() = readFile(usersFilename)
+  private def readUsers = {
+    val usersFilename = "data/users.json"
+    decode[Seq[User]](readFile(usersFilename)).left.map(e =>
+      SearchFailure(s"Error parsing $usersFilename: ${e.getLocalizedMessage}")
+    )
+  }
+
+  private def loadSources = {
+    for {
+      organizations <- readOrganizations
+      tickets <- readTickets
+      users <- readUsers
+    } yield (organizations, tickets, users)
+  }
 
   def main(args: Array[String]) = {
-    val organizations = decode[Seq[Organization]](readOrganizationsFile())
-
-    val flattenedOrganizationsResult = organizations match {
-      case Left(e) => SearchFailure(s"Error parsing $organizationsFilename: ${e.getLocalizedMessage}").asJson
-      case Right(organizationsSuccess) => organizationsSuccess.asJson
+    loadSources match {
+      case Left(error) => {
+        Console.println(error)
+        System.exit(-1)
+      }
+      case Right((organizations, tickets, users)) => {
+        Console.println(organizations, tickets, users)
+      }
     }
-
-    Console.println(flattenedOrganizationsResult)
-
-    val tickets = decode[Seq[Ticket]](readTicketsFile())
-
-    val flattenedTicketsResult = tickets match {
-      case Left(e) => SearchFailure(s"Error parsing $ticketsFilename: ${e.getLocalizedMessage}").asJson
-      case Right(ticketsSuccess) => ticketsSuccess.asJson
-    }
-
-    Console.println(flattenedTicketsResult)
-
-    val users = decode[Seq[User]](readUsersFile())
-
-    val flattenedUsersResult = users match {
-      case Left(e) => SearchFailure(s"Error parsing $usersFilename: ${e.getLocalizedMessage}").asJson
-      case Right(usersSuccess) => usersSuccess.asJson
-    }
-
-    Console.println(flattenedUsersResult)
   }
 }
