@@ -1,10 +1,12 @@
+package Sources
+
 import java.time.OffsetDateTime
 
 import io.circe._
 import io.circe.generic.auto._
 import io.circe.parser._
-import search.User
-import search.OffsetDateTimeParsing._
+
+import Sources.OffsetDateTimeParsing._
 
 class UserDecoderTest extends org.specs2.mutable.Specification {
   "Decoding User" >> {
@@ -49,13 +51,13 @@ class UserDecoderTest extends org.specs2.mutable.Specification {
             external_id = "74341f74-9c79-49d5-9611-87ef9b6eb75f",
             name = "Francisca Rasmussen",
             alias = Some("Miss Coffey"),
-            created_at = OffsetDateTime.parse("2016-04-15T05:19:46-10:00"), //TODO deal with extra space in input
+            created_at = OffsetDateTime.parse("2016-04-15T05:19:46-10:00"),
             active = true,
             verified = Some(true),
             shared = false,
             locale = Some("en-AU"),
             timezone = Some("Sri Lanka"),
-            last_login_at = OffsetDateTime.parse("2013-08-04T01:03:27-10:00"), //TODO deal with extra space in input
+            last_login_at = OffsetDateTime.parse("2013-08-04T01:03:27-10:00"),
             email = Some("coffeyrasmussen@flotonic.com"),
             phone = "8335-422-718",
             signature= "Don't Worry Be Happy!",

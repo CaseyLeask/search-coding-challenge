@@ -1,10 +1,12 @@
+package Sources
+
 import java.time.OffsetDateTime
 
 import io.circe._
 import io.circe.generic.auto._
 import io.circe.parser._
-import search.Organization
-import search.OffsetDateTimeParsing._
+
+import Sources.OffsetDateTimeParsing._
 
 class OrganizationDecoderTest extends org.specs2.mutable.Specification {
   "Decoding Organization" >> {
