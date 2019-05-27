@@ -1,5 +1,6 @@
 package InputParsing
 
+import Indexer.Search
 import InputParsing.ReadingFromFile.Sources
 import State.CommandLine
 import State.CommandLine.{BlankSearchTerm, CommandAction, CommandState, EnterSearchTerm, EnterSearchValue, MakeSearch, NoAction, QuitProgram, SelectSearchOptions, SelectSourceOptions, SourceSelection, UnrecognizedCommand, ViewSearchableFields, Welcome}
@@ -12,12 +13,9 @@ object ConsoleInteraction {
     execute(sources, Source.stdin.getLines())
   }
 
-  def makeSearch(selection: CommandLine.SourceSelection, str: String, str1: String) = Unit
-  def viewSearchableFields = Unit
-
-  def takeAction(action: CommandAction): Unit = action match {
-    case MakeSearch(sourceSelection, searchTerm, searchValue) => makeSearch(sourceSelection, searchTerm, searchValue)
-    case ViewSearchableFields => viewSearchableFields
+  def takeAction(sources: Sources, action: CommandAction): Unit = action match {
+    case MakeSearch(sourceSelection, searchTerm, searchValue) => Search.makeSearch(sources, sourceSelection, searchTerm, searchValue)
+    case ViewSearchableFields => Search.viewSearchableFields(sources)
     case NoAction => Unit
     case UnrecognizedCommand(text) => Console.println(s"Sorry! Couldn't recognise '$text'")
     case BlankSearchTerm => Console.println("Sorry! We don't support a blank search term")
@@ -61,7 +59,7 @@ object ConsoleInteraction {
     commands.foldLeft[CommandState](initialState)((state, command) => {
       val (action: CommandAction, newState: CommandState) = CommandLine.nextState(state, command)
 
-      takeAction(action)
+      takeAction(sources, action)
       printState(newState)
 
       newState
