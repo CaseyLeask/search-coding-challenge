@@ -8,7 +8,103 @@ import Sources.Ticket._
 
 class TicketDecoderTest extends org.specs2.mutable.Specification {
   "Decoding Ticket" >> {
-    "With valid JSON" >> {
+    "With an invalid JSON string" >> {
+      val rawJson: String =
+        """
+          {
+            "_id": "436bf9b0-1147-4c0a-8439-6f79833bff5b",
+            "url": "http://initech.zendesk.com/api/v2/tickets/436bf9b0-1147-4c0a-8439-6f79833bff5b.json",
+            "external_id": "9210cdc9-4bee-485f-a078-35396cd74063",
+            "created_at": "2016-04-28T11:19:34 -10:00",
+            "subject": "A Catastrophe in Korea (North)",
+            "priority": "high",
+            "status": "pending",
+            "submitter_id": 38,
+            "tags": [],
+            "has_incidents": false,
+            "via": "web",
+          }
+        """
+
+
+      "should not correctly parse" >> {
+        val result: Either[Error, Ticket] = decode[Ticket](rawJson)
+
+        result must beLeft
+      }
+    }
+
+    "With an incomplete JSON string" >> {
+      val rawJson: String =
+        """
+          {
+            "_id": "436bf9b0-1147-4c0a-8439-6f79833bff5b",
+            "url": "http://initech.zendesk.com/api/v2/tickets/436bf9b0-1147-4c0a-8439-6f79833bff5b.json",
+            "external_id": "9210cdc9-4bee-485f-a078-35396cd74063",
+            "created_at": "2016-04-28T11:19:34 -10:00",
+            "subject": "A Catastrophe in Korea (North)",
+            "priority": "high",
+            "status": "pending",
+            "submitter_id": 38,
+            "tags": [],
+            "has_incidents": false
+          }
+        """
+
+
+      "should not correctly parse" >> {
+        val result: Either[Error, Ticket] = decode[Ticket](rawJson)
+
+        result must beLeft
+      }
+
+    }
+
+    "With a minimal JSON string" >> {
+      val rawJson: String =
+        """
+          {
+            "_id": "436bf9b0-1147-4c0a-8439-6f79833bff5b",
+            "url": "http://initech.zendesk.com/api/v2/tickets/436bf9b0-1147-4c0a-8439-6f79833bff5b.json",
+            "external_id": "9210cdc9-4bee-485f-a078-35396cd74063",
+            "created_at": "2016-04-28T11:19:34 -10:00",
+            "subject": "A Catastrophe in Korea (North)",
+            "priority": "high",
+            "status": "pending",
+            "submitter_id": 38,
+            "tags": [],
+            "has_incidents": false,
+            "via": "web"
+          }
+        """
+
+      "should correctly parse" >> {
+        val result: Either[Error, Ticket] = decode[Ticket](rawJson)
+
+        result must beRight(
+          Ticket(
+            _id = "436bf9b0-1147-4c0a-8439-6f79833bff5b",
+            url = "http://initech.zendesk.com/api/v2/tickets/436bf9b0-1147-4c0a-8439-6f79833bff5b.json",
+            external_id = "9210cdc9-4bee-485f-a078-35396cd74063",
+            created_at = OffsetDateTime.parse("2016-04-28T11:19:34-10:00"),
+            ticket_type = None,
+            subject = "A Catastrophe in Korea (North)",
+            description = None,
+            priority = "high",
+            status = "pending",
+            submitter_id = 38,
+            assignee_id = None,
+            organization_id = None,
+            tags = Seq(),
+            has_incidents = false,
+            due_at = None,
+            via = "web"
+          )
+        )
+      }
+    }
+
+    "With a complete JSON string" >> {
       val rawJson: String =
         """
         {
